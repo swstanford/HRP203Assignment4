@@ -1,4 +1,3 @@
-## A Quarto Manuscript Template
-
-This is a template repo for generating a manuscript from Quarto that accompanies the tutorial at: [Quarto Manuscripts: RStudio](https://quarto.org/docs/manuscripts/authoring/rstudio.html)
-
+# HRP 203 Assignment 4 
+## A Quarto Manuscript 
+This is the repository for HRP 203 Assignment #4. It contains the following files: 1. raw data (cohort simulated data from Assignment #2) 2. 
