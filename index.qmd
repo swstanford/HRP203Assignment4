@@ -1,111 +1,244 @@
 ---
-title: La Palma Earthquakes
+title: In-Hospital Cardiac Events and Cost Based on Simulated Data 
 author:
-  - name: Steve Purves
-    orcid: 0000-0002-0760-5497
+  - name: Simeng Wang
     corresponding: true
-    email: steve@curvenote.com
+    email: simeng@stanford.edu
     roles:
       - Investigation
-      - Project administration
-      - Software
       - Visualization
+      - Manuscript preparation and review 
     affiliations:
-      - Curvenote
-  - name: Rowan Cockett
-    orcid: 0000-0002-7859-8394
-    corresponding: false
-    roles: []
-    affiliations:
-      - Curvenote
+      - Stanford University School of Medicine
 keywords:
-  - La Palma
-  - Earthquakes
+  - cardiac events
+  - hospitalization cost 
 abstract: |
-  In September 2021, a significant jump in seismic activity on the island of La Palma (Canary Islands, Spain) signaled the start of a volcanic crisis that still continues at the time of writing. Earthquake data is continually collected and published by the Instituto Geográphico Nacional (IGN). ...
-plain-language-summary: |
-  Earthquake data for the island of La Palma from the September 2021 eruption is found ...
-key-points:
-  - A web scraping script was developed to pull data from the Instituto Geogràphico Nacional into a machine-readable form for analysis
-  - Earthquake events on La Palma are consistent with the presence of both mantle and crustal reservoirs.
+  Certain cardiovascular risk factors have long been defined. It is unclear whether having those risk factors can predispose patients to in-hospital cardiac events, which can also be exacerbated due to acute illness, medication use, and stress from interventions. In this study, 5000 patients from a simulated cohort dataset were retrospectively examined. Smoking status and male sex were found to be significant risk factors for in-hospital cardiac events. Age was not a significant risk factor when other variables were controlled. Patients who had cardiac events during the hospitalization incurred higher cost that those who did not. The study pointed towards a direction of potentially lowering hospitalization cost by optimizing patients' cardiovascular risk factors. 
+  
 date: last-modified
 bibliography: references.bib
-citation:
-  container-title: Earth and Space Science
-number-sections: true
 ---
 
 ## Introduction
+Cardiovascular diseases, which include coronary heart disease, peripheral artery disease, and stroke, are common worldwide. They were estimated to have resulted in more than 17 million deaths on an annual basis from 2012 to 2013 [@Laslett2012-ja]. Atherosclerosis, a process in which plaques are developed within the vascular wall and culminate in thromboembolism, is responsible for many cardiovascular diseases according to a study by @Falk2006-tq. There are several established risk factors for atherosclerosis and they often act in concert to increase the overall risks. Atherosclerosis tends to develop with age due to repeated endothelial injury that can result in intimal plaque built-up [@Falk2006-tq]. Men were found to be at three times higher risks than women in a Finnish longitudinal population study [@Jousilahti1999-ar]. Smoking is a well-known risk factor for cardiovascular disease and smoking cessation has been demonstrated to contribute to decreased prevalence of sudden myocardial infarction [@Ambrose2004-qs]. However, it is less clear whether these risk factors also contribute to risks for in-hospital cardiac events when patients were admitted for other illnesses. 
+
+In-hospital cardiac events can lead to increased morbidity and mortality [@Ramadan2022-kq]. They can additionally result in significant cost associated with the hospitalization, which add to the cost to healthcare system and exacerbate financial toxicity for patients [@Kwok2021-gf]. In this study, we used a simulated datatset to establish a prediction model for in-hospital cardiac events using multiple known risk factors cardiovascular diseases, seeking to characterize cost difference among patients who did or did not have cardiac events and propose modifiable factors to minimize cardiac events occurrence and associated cost. 
+
+## Data & Methods 
 
 ```{r}
-eruptions <- c(1492, 1585, 1646, 1677, 1712, 1949, 1971, 2021)
-n_eruptions <- length(eruptions)
+library (tidyverse)
+library (here)
+
+cohort_df = read.csv(here::here("raw_data","cohort.csv")) # load dataset using a relative path 
+id_count <- nrow (cohort_df) # count of patients in the dataset 
+var_count <- ncol (cohort_df) # count of variables in the dataset 
 ```
 
-```{r}
-#| label: fig-timeline
-#| fig-cap: Timeline of recent earthquakes on La Palma
-#| fig-alt: An event plot of the years of the last 8 eruptions on La Palma.
-#| fig-height: 1.5
-#| fig-width: 6
-par(mar = c(3, 1, 1, 1) + 0.1)
-plot(eruptions, rep(0, n_eruptions), 
-  pch = "|", axes = FALSE)
-axis(1)
-box()
-```
 
-```{r}
-#| output: false
-avg_years_between_eruptions <- mean(diff(eruptions[-n_eruptions]))
-avg_years_between_eruptions
-```
+This study was conducted using a cohort simulated data for the course HRP 203 at Stanford University during the spring quarter of 2024-2025 academic year. The data contained `{r} id_count` individual patients. Data of `{r} var_count` variables were collected for each patient, including their smoking status, sex, age, whether they had a cardiac event during the hospitalization, and the cost of the hospitalization. 
 
-Based on data up to and including 1971, eruptions on La Palma happen every `{r} round(avg_years_between_eruptions, 1)` years on average.
-
-Studies of the magma systems feeding the volcano, such as @marrero2019, have proposed that there are two main magma reservoirs feeding the Cumbre Vieja volcano; one in the mantle (30-40km depth) which charges and in turn feeds a shallower crustal reservoir (10-20km depth).
-
-Eight eruptions have been recorded since the late 1400s (@fig-timeline).
-
-Data and methods are discussed in @sec-data-methods.
-
-Let $x$ denote the number of eruptions in a year. Then, $x$ can be modeled by a Poisson distribution
+Statistical analyses were performed using R version 4.4.2 (2024-10-31) and the manuscript was prepared using the Quarto®. Data summary was performed by counting the percentage of an event or averaging the statistics of a numeric variable. Figures were constructed using the ggplot2 package in R. A logistic regression model was constructed to look for statistically significant predictors of cardiac events during the hospitalization. The regression formula is shown below, where $Y_c$ denotes cardiac events, $\beta_0$ denotes intercept, and $\varepsilon_i$ denotes random error term. 
 
 $$
-p(x) = \frac{e^{-\lambda} \lambda^{x}}{x !}
-$$ {#eq-poisson}
+Y_c =  \beta_0+ \beta_1*smoke+\beta_2*female+\beta_3*age+\varepsilon_i
+$$ 
 
-where $\lambda$ is the rate of eruptions per year. Using @eq-poisson, the probability of an eruption in the next $t$ years can be calculated.
+I attest that I did not use generative artificial intelligence technology to complete any portion of the work.
 
-| Name                 | Year   |
-| -------------------- | ------ |
-| Current              | 2021   |
-| Teneguía             | 1971   |
-| Nambroque            | 1949   |
-| El Charco            | 1712   |
-| Volcán San Antonio   | 1677   |
-| Volcán San Martin    | 1646   |
-| Tajuya near El Paso  | 1585   |
-| Montaña Quemada      | 1492   |
+## Results
+```{r}
+#| label: table1
+library(dplyr)
+library(knitr)
 
-: Recent historic eruptions on La Palma {#tbl-history}
+# Calculate the summary statistics for Table 1 
+table1 <- cohort_df %>% 
+  summarize(
+    `Total Number of Patient` = nrow (cohort_df),
+    `Percent Female` = mean(female, na.rm = TRUE)*100, 
+    `Percent Smokers` = mean(smoke, na.rm = TRUE)*100, 
+    `Average Age` = mean(age, na.rm = TRUE), 
+    `Percent Cardiac Event` = mean(cardiac, na.rm = TRUE)*100, 
+    `Average Cost` = mean(cost, na.rm = TRUE)
+  ) %>% 
+  t() %>% 
+  as.data.frame()
 
-@tbl-history summarises the eruptions recorded since the colonization of the islands by Europeans in the late 1400s.
+#Create Table 1 
+colnames(table1) <- "Value"
+table1$Value <- round(table1$Value, 0)  #round to 1 decimal place 
+table1$Variable <- rownames(table1)
+rownames(table1) <- NULL
+table1 <- table1[, c("Variable", "Value")]
 
-![Map of La Palma](images/la-palma-map.png){#fig-map}
+#Print Table 1 
+kable(table1, caption = "Table 1. Summary Statistics of the Cohort")
 
-La Palma is one of the west most islands in the Volcanic Archipelago of the Canary Islands (@fig-map). 
+```
+Table 1 summarizes the statistics in this dataset. Among the 5000 patients, 55% were female, 16% were smokers, and 5% had a cardiac event during the hospitalization. The average age of the cohort was 44 years. The average cost of the hospitalization was 9166 dollars. 
 
-{{< embed notebooks/explore-earthquakes.qmd#fig-spatial-plot >}}
 
-@fig-spatial-plot shows the location of recent Earthquakes on La Palma.
+```{r}
+#| label: figure1 #plot cardiac event rate vs. age, separate by sex
+library(dplyr)
+library(ggplot2)
 
-## Data & Methods {#sec-data-methods}
+# Construct dataset for Figure 1
+# Group patients into different age groups, separated by 10 years apart 
+# Subdivide by sex 
+figure1 <- cohort_df %>% 
+  mutate(
+    age_group = cut(age, breaks = seq (15, 75, by = 10)),
+    sex = factor(female, levels = c(1,0), labels =c("Female", false="Male"))
+) %>% 
+  group_by(age_group, sex) %>% 
+  summarize(
+    n= n(),
+    event_rate = mean(cardiac, na.rm = TRUE),
+    .groups = "drop"
+  ) %>% 
+  filter(!is.na(age_group), !is.na(sex))
+                    
+#Plot 
+ggplot(figure1,
+       aes(x = age_group, y = event_rate, color = sex, group = sex)) +
+  geom_line (linewidth = 1.2) +
+  geom_point (size = 3) +
+  scale_y_continuous(labels = scales ::percent_format()) + 
+  labs(
+    title = "Figure 1. Cardiac Event Rate by Age Group, Male vs. Female",
+    x = "Age Group",
+    y = "Cardiac Event Rate",
+    color = "Sex"
+  ) +
+  theme_minimal()
 
-## Conclusion
+```
+
+```{r}
+#| label: figure2 #plot cardiac event rate vs. age, separate by smoking status 
+library(dplyr)
+library(ggplot2)
+
+# Construct dataset for Figure 2
+# Group patients into different age groups, separated by 10 years apart 
+# Subdivide by smoking status 
+figure2 <- cohort_df %>% 
+  mutate(
+    age_group = cut(age, breaks = seq (15, 75, by = 10)),
+    smoking_status = factor(smoke, levels = c(1,0), labels =c("Smokers", "Non-Smokers")), 
+) %>% 
+  group_by(age_group, smoking_status) %>% 
+  summarize(
+    n= n(),
+    event_rate = mean(cardiac, na.rm = TRUE),
+    .groups = "drop"
+  ) %>% 
+  filter(!is.na(age_group), !is.na(smoking_status))
+                    
+#Plot 
+ggplot(figure2,
+       aes(x = age_group, y = event_rate, color = smoking_status, group = smoking_status)) +
+  scale_color_manual(values = c("Smokers" = "orange", "Non-Smokers" = "green")) + #Selected new colors for this lineplot 
+  geom_line (linewidth = 1.2) +
+  geom_point (size = 3) +
+  scale_y_continuous(labels = scales ::percent_format()) + 
+  labs(
+    title = "Figure 2. Cardiac Event Rate by Age Group, Smokers vs. Non-Smokers",
+    x = "Age Group",
+    y = "Cardiac Event Rate",
+  ) +
+  theme_minimal()
+```
+Figure 1 and Figure 2 demonstrate the cardiac events rate among this patient cohort. It was evident that there was a trend of increasing cardiac event rate by patient's age. The cardiac event rate was higher among male patients than female patients across all age groups; similarly, higher among smokers than non-smokers. The highest cardiac event rate was found among patients who were smokers between 65 and 75 years of age, which was 28.1%.
+
+
+```{r}
+#| label: lr_table
+library(dplyr)
+library(broom)
+library(knitr)
+
+# Fit linear regression model 
+lr <- glm(cardiac ~ smoke + female + age, data = cohort_df, family="binomial")
+
+# Extract odds ratio and 95% confidence interval and summarize results with broom package 
+lr_table <- tidy(lr, exponentiate = TRUE, conf.int = TRUE) %>% 
+  filter(term != "(Intercept)") %>%  #remove the intercept row 
+  select(term, estimate, conf.low, conf.high, p.value) %>%   #calculate odds ratio and confidence interval 
+  rename(
+    Term = term,
+    OR = estimate,  
+    "CI Lower" = conf.low,
+    "CI Upper" = conf.high,
+    "P-value" = p.value
+  ) %>% 
+  mutate(
+    OR = round(OR, 2),   #rounding 
+    `CI Lower` = round(`CI Lower`, 2),
+    `CI Upper` = round(`CI Upper`, 2),
+    `P-value` = signif(`P-value`, 1)
+  ) 
+
+#Print result table 
+knitr::kable(lr_table, caption = "Table 2. Linear Regression Predicting Hospital Cardiac Event")
+
+```
+The result of the linear regression model was shown in Table 2. Smoking status and sex of the patient were significantly associated with cardiac events. The odds of smokers were 8.26 times of that of nonsmokers (95% confidence interval, CI, 6.27-10.91). Odds of female were 0.08 of that of male, which was equivalent to the odds of male being 12.5 of that of female for developing cardiac events (95% CI, 8.33-16.67). Age had a positive association with developing a cardiac event, but it did not achieve statistical significance when other variables were controlled for. 
+
+```{r}
+#| label: figure3
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+
+# Construct dataset for Figure 3
+figure3 <- cohort_df %>% 
+  mutate(
+    Smoking_Status = factor(smoke, levels = c(1,0), labels =c("Smokers", "Non-Smokers")), 
+    Sex = factor(female, levels = c(1,0), labels =c("Female", false="Male")),
+    Cardiac_Event= factor(cardiac, levels = c(1,0), labels = c("Event", "No Event"))
+) %>% 
+pivot_longer(
+  cols = c(Smoking_Status, Sex, Cardiac_Event),
+  names_to = "Group",
+  values_to = "Category"
+) %>% 
+  mutate(fillcolor = Group)
+        
+
+#define the color of each facet 
+facet_colors <- c(
+  "Sex" ="green",
+  "Smoking_status" = "grey",
+  "Cardiac_Event" = "red"
+)
+
+#Create three different facets (by different variables)
+ggplot(
+  figure3, aes(x = Category, y = cost, fill=fillcolor)) + 
+  geom_boxplot(outlier.size =0.8) +
+  scale_fill_manual(values = facet_colors) +
+  facet_wrap(~ Group, scales = "free_x") +
+  labs(
+    title = "Figure 3. Hospital Cost Difference by Smoking Status, Sex, and Cardiac Event",
+    x = "", y = "Cost in Dollar"
+  ) + 
+theme_minimal() +
+  theme(legend.position = "none")
+        
+```
+Figure 3 demonstrates the cost differences when the patients in the dataset were grouped by their characteristics. On average, patients who had a cardiac event during the hospitalization had higher cost than those who did not; male patients had higher cost than female patients; and smokers had higher cost than non-smokers.
+
+
+## Discussion
+This study demonstrated that smoking status and male sex were significant risks factors for in-hospital cardiac events. There was a trend of increased risk with age, although statistical significance was not achieved in the regression model. It proposed a prediction model that can be used to estimate a patient's in-hospital cardiac event risks based on several risk factors. Additionally, the study demonstrated increased cost of hospitalization associated with cardiac events. 
+
+There are several limitation to the study. First, the risk factors for cardiovascular diseases were not all inclusive. Multiple other known factors, such as hypertension and diabetes were missing in the dataset [@Saeedi2019-ba]. Second, there was not adequate granularity in terms of hospitalization characteristics, such as undergoing invasive procedures, use of antiplatelet therapy, or massive volume resuscitation, that could positively or negatively impact risks for cardiac events. Third, the study was modeled on a simulated dataset therefore it is unknown whether it can be generalized to real-life practice. Nevertheless, the study proposed a feasible methodology to establish a prediction model for in-hospital cardiac events. Future directions will focus on collecting multi-center data, expanding variables to enhance the prediction capability of the model, and prospectively validate the model. The ultimate goal of the study will be to help clinicians identify and optimize risks for in-hospital events, which can lead to decreased morbidity, mortality, and cost of hospitalization. 
 
 ## References {.unnumbered}
 
-:::{#refs}
-
+::: {#refs}
 :::
